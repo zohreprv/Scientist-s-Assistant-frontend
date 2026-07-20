@@ -111,7 +111,7 @@ const Filter = () => {
         {filterOpen && (
           <div
             className="absolute w-30 md:w-45 flex flex-col bg-gray-200 rounded
-                   text-gray-700 p-3 space-y-2 border border-gray-300 right-0 lg:left-0"
+                   text-gray-700 p-3 space-y-2 border border-gray-300 right-0 lg:left-0 z-100"
             id="search-mode-options"
             role="listbox"
             aria-label="Search mode options"
