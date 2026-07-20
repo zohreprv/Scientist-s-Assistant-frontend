@@ -9,6 +9,7 @@
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
+    @remix-run/dev
     "@fontsource-variable/geist": "^5.2.9",
     "@react-router/node": "8.0.0",
     "@react-router/serve": "8.0.0",
