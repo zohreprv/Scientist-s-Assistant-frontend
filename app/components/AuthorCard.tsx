@@ -4,6 +4,7 @@ const AuthorCard = ({ author }) => {
     <div className="border border-gray-400 rounded-lg p-5 space-y-2">
       <Link
         to={`/authors/${author.id.replace('https://openalex.org/', '')}`}
+        target="_blank"
         className="block cursor-pointer"
       >
         <h2 className="font-semibold text-gray-200 text-2xl">

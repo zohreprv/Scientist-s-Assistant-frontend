@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
-import { useDebounce } from 'use-debounce';
 import { useNavigate, useLocation } from 'react-router';
 import { useUrl } from '../../../Context/UrlContext';
 import { useAuthorUrl } from '../../../Context/AuthorUrlContext';
@@ -12,43 +11,12 @@ const Filter = () => {
   const searchMode = location?.pathname === '/works' ? 'works' : 'authors';
   const [filterOpen, setFilterOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-
   const dropdownRef = useRef(null);
   const worksContext = useUrl();
   const authorContext = useAuthorUrl();
 
   const { url, setUrl, search, setSearch } =
     searchMode === 'works' ? worksContext : authorContext;
-  const [debouncedSearch] = useDebounce(search, 1000);
-  // useEffect(() => {
-  //   const newSearch =
-  //     searchMode === 'works'
-  //       ? searchParams.get('title_and_abstract.search') || ''
-  //       : searchMode === 'authors'
-  //         ? searchParams.get('display_name.search') || ''
-  //         : '';
-  //   setSearch(newSearch);
-  // }, [searchParams]);
-
-  useEffect(() => {
-    if (searchMode === 'works') {
-      setUrl({
-        filter: {
-          ...url.filter,
-          'title_and_abstract.search': debouncedSearch,
-        },
-        search: { ...url.search },
-      });
-    } else {
-      setUrl({
-        filter: {
-          ...url.filter,
-          'display_name.search': debouncedSearch,
-        },
-        search: { ...url.search },
-      });
-    }
-  }, [debouncedSearch]);
 
   const handleChange = (e) => {
     navigate(`/${e.target.value}`);
@@ -91,7 +59,7 @@ const Filter = () => {
 
       <div className="relative" ref={dropdownRef}>
         <button
-          className="flex justify-between items-center bg-gray-700
+          className="flex justify-between items-center bg-darkgray
                      text-white mb-1 px-4 py-1 rounded cursor-pointer 
                      gap-2"
           onClick={() => {

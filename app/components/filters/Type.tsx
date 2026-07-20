@@ -55,7 +55,7 @@ const Type = ({ urlObj, setUrlObj, setWorks }) => {
   return (
     <div className="relative" ref={componentRef}>
       <button
-        className="flex justify-between items-center bg-gray-700
+        className="flex justify-between items-center bg-darkgray
                  text-white mb-1 px-4 py-1 rounded cursor-pointer
                  space-x-2"
         onClick={() => {

@@ -73,7 +73,7 @@ const YearFilter = ({ urlObj, setUrlObj }) => {
   return (
     <div className="relative" ref={componentRef}>
       <div
-        className="flex justify-between items-center bg-gray-700
+        className="flex justify-between items-center bg-darkgray
              text-white mb-1 px-4 py-1 rounded 
              space-x-2"
         role="button"

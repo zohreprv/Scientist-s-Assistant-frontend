@@ -4,10 +4,11 @@ import { AuthorUrlProvider } from '../../../Context/AuthorUrlContext';
 import { AuthorSideProvider } from '../../../Context/AuthorSideContext';
 const AuthorsLayout = () => {
   return (
-    <div className="flex mx-auto space-x-5">
+    <div className="flex mx-auto space-x-5 ">
       <AuthorUrlProvider>
         <AuthorSideProvider>
-          <div className="flex-1">
+          <div className="flex-1 mx-auto max-w-screen lg:max-w-auto">
+            {' '}
             <Outlet />
           </div>
           <SideBar />

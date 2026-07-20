@@ -52,7 +52,7 @@ const Works = () => {
           <OpenAccessFilter urlObj={urlObj} setUrlObj={setUrlObj} />
           <div>
             <button
-              className="flex justify-between items-center bg-gray-700
+              className="flex justify-between items-center bg-darkgray
              text-white mb-1 px-4 py-1 rounded cursor-pointer
              space-x-2"
               onClick={() => setIsTypeModalOpen(!isTypeModalOpen)}
@@ -69,7 +69,7 @@ const Works = () => {
           </div>
           <div>
             <button
-              className="justify-between items-center bg-gray-700
+              className="justify-between items-center bg-darkgray
              text-white mb-1 px-4 py-1 rounded cursor-pointer
              space-x-2 lg:hidden"
               onClick={() => setIsTopicModalOpen(!isTopicModalOpen)}

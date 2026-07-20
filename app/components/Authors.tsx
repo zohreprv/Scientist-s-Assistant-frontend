@@ -29,7 +29,7 @@ const Authors = () => {
       <div className="flex items-center gap-2">
         <div>
           <button
-            className="flex justify-between items-center bg-gray-700
+            className="flex justify-between items-center bg-darkgray
              text-white mb-1 px-4 py-1 rounded cursor-pointer
              space-x-2 lg:hidden "
             onClick={() => setIsInsModalOpen(!isInsModalOpen)}
@@ -47,7 +47,7 @@ const Authors = () => {
 
         <div>
           <button
-            className="flex justify-between items-center bg-gray-700
+            className="flex justify-between items-center bg-darkgray
              text-white mb-1 px-4 py-1 rounded cursor-pointer
              space-x-2 lg:hidden "
             onClick={() => setIsCountryModalOpen(!isCountryModalOpen)}

@@ -9,7 +9,7 @@ const SortFilter = ({ sort, handleSortChange }) => {
   return (
     <div className="relative w-fit">
       <button
-        className="flex justify-between items-center bg-gray-700
+        className="flex justify-between items-center bg-darkgray
              text-white mb-1 px-1 py-3/4 rounded cursor-pointer
              space-x-2"
         onClick={() => handleSortChange(t)}

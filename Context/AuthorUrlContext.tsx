@@ -1,11 +1,13 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router';
+import { useDebounce } from 'use-debounce';
+
 export const authorUrlContext = createContext(null);
 export const AuthorUrlProvider = ({ children }) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [search, setSearch] = useState(
-    searchParams.get('display_name.search') || '',
-  );
+  const [search, setSearch] = useState('');
+  const [debouncedSearch] = useDebounce(search, 1000);
+
   const [url, setUrl] = useState({
     search: {
       page: parseInt(searchParams.get('page')) || 1,
@@ -15,6 +17,15 @@ export const AuthorUrlProvider = ({ children }) => {
       'display_name.search': searchParams.get('display_name.search') || '',
     },
   });
+  useEffect(() => {
+    setUrl((prev) => ({
+      ...prev,
+      filter: {
+        ...prev.filter,
+        'display_name.search': debouncedSearch,
+      },
+    }));
+  }, [debouncedSearch]);
   useEffect(() => {
     const newParams = new URLSearchParams(searchParams);
     Object.entries(url.filter).forEach(([key, value], index) => {

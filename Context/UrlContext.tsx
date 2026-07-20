@@ -1,12 +1,22 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router';
+import { useDebounce } from 'use-debounce';
+
 const curYear = new Date().getFullYear();
 export const urlContext = createContext(null);
 export const UrlProvider = ({ children }) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [search, setSearch] = useState(
-    searchParams.get('title_and_abstract.search') || '',
-  );
+  const [search, setSearch] = useState('');
+  const [debouncedSearch] = useDebounce(search, 1000);
+  useEffect(() => {
+    setUrl((prev) => ({
+      ...prev,
+      filter: {
+        ...prev.filter,
+        'title_and_abstract.search': debouncedSearch,
+      },
+    }));
+  }, [debouncedSearch]);
   const filter = searchParams.get('filter') || '';
   const yearMatch = filter.match(/publication_year:([^,]+)/);
   const publicationYear = yearMatch

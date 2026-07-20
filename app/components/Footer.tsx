@@ -56,7 +56,6 @@ const Footer = () => {
               <FaUsers size={14} />
               Authors
             </a>
-            <div className="w-px h-4 bg-gray-700 hidden sm:block"></div>
             <a
               href="https://openalex.org"
               target="_blank"
