@@ -3,15 +3,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "react-router build",
-    "dev": "react-router dev",
-    "start": "react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc"
+    "build": "remix build",
+    "dev": "remix dev",
+    "start": "remix-serve build/index.js",
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.9",
-    "@react-router/node": "8.0.0",
-    "@react-router/serve": "8.0.0",
+    "@remix-run/node": "2.17.5",
+    "@remix-run/react": "2.17.5",
+    "@remix-run/serve": "2.17.5",
     "@tanstack/react-query": "^5.101.1",
     "chart.js": "^4.5.1",
     "class-variance-authority": "^0.7.1",
@@ -19,11 +20,10 @@
     "isbot": "^5.1.36",
     "lucide-react": "^1.22.0",
     "radix-ui": "^1.6.1",
-    "react": "^19.2.7",
+    "react": "18.3.1",
     "react-chartjs-2": "^5.3.1",
-    "react-dom": "^19.2.7",
+    "react-dom": "18.3.1",
     "react-icons": "^5.6.0",
-    "react-router": "8.0.0",
     "react-scrollbars-custom": "^4.1.1",
     "react-spinners": "^0.17.0",
     "shadcn": "^4.12.0",
@@ -33,13 +33,21 @@
     "use-debounce": "^10.1.1"
   },
   "devDependencies": {
-    "@react-router/dev": "8.0.0",
+    "@remix-run/dev": "2.17.5",
     "@tailwindcss/vite": "^4.2.2",
     "@types/node": "^22",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
     "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3",
     "vite": "^8.0.3"
+  },
+  "overrides": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "resolutions": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
   }
 }
