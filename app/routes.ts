@@ -14,5 +14,5 @@ export default [
     route('/authors', 'routes/authors/index.tsx'),
   ]),
   route('authors/:authorId', 'routes/authors/details.tsx'),
-  route('*', 'routes/notFound/index.tsx'),
+  route('*', 'routes/NotFound/index.tsx'),
 ] satisfies RouteConfig;
