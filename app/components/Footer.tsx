@@ -31,7 +31,7 @@ const Footer = () => {
                 alt="Scientist's Assistant Logo"
                 className="h-10 w-10"
               />
-              <h1 className="font-semibold text-xl whitespace-nowrap">
+              <h1 className="font-semibold text-xl text-white">
                 Scientist's <span className="text-blue">Assistant</span>
               </h1>
             </div>
@@ -43,18 +43,18 @@ const Footer = () => {
           {/* Center: Quick Links */}
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
             <a
-              href="/authors"
-              className="text-gray-400 hover:text-blue transition-colors flex items-center gap-1.5"
-            >
-              <FaUsers size={14} />
-              Authors
-            </a>
-            <a
               href="/works"
               className="text-gray-400 hover:text-blue transition-colors flex items-center gap-1.5"
             >
               <FaBook size={14} />
               Works
+            </a>
+            <a
+              href="/authors"
+              className="text-gray-400 hover:text-blue transition-colors flex items-center gap-1.5"
+            >
+              <FaUsers size={14} />
+              Authors
             </a>
             <div className="w-px h-4 bg-gray-700 hidden sm:block"></div>
             <a

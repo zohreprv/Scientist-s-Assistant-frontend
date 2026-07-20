@@ -4,6 +4,9 @@ const curYear = new Date().getFullYear();
 export const urlContext = createContext(null);
 export const UrlProvider = ({ children }) => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [search, setSearch] = useState(
+    searchParams.get('title_and_abstract.search') || '',
+  );
   const filter = searchParams.get('filter') || '';
   const yearMatch = filter.match(/publication_year:([^,]+)/);
   const publicationYear = yearMatch
@@ -54,7 +57,7 @@ export const UrlProvider = ({ children }) => {
     setSearchParams(newParams);
   }, [url]);
   return (
-    <urlContext.Provider value={{ url, setUrl }}>
+    <urlContext.Provider value={{ url, setUrl, search, setSearch }}>
       {children}
     </urlContext.Provider>
   );

@@ -3,12 +3,17 @@ import { useSearchParams } from 'react-router';
 export const authorUrlContext = createContext(null);
 export const AuthorUrlProvider = ({ children }) => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [search, setSearch] = useState(
+    searchParams.get('display_name.search') || '',
+  );
   const [url, setUrl] = useState({
     search: {
       page: parseInt(searchParams.get('page')) || 1,
       per_page: parseInt(searchParams.get('per_page')) || 4,
     },
-    filter: {},
+    filter: {
+      'display_name.search': searchParams.get('display_name.search') || '',
+    },
   });
   useEffect(() => {
     const newParams = new URLSearchParams(searchParams);
@@ -38,7 +43,7 @@ export const AuthorUrlProvider = ({ children }) => {
     setSearchParams(newParams);
   }, [url]);
   return (
-    <authorUrlContext.Provider value={{ url, setUrl }}>
+    <authorUrlContext.Provider value={{ url, setUrl, search, setSearch }}>
       {children}
     </authorUrlContext.Provider>
   );
