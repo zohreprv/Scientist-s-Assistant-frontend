@@ -102,7 +102,7 @@ const Filter = () => {
           aria-expanded={filterOpen}
           aria-controls="search-mode-options"
         >
-          <span className="capitalize">{searchMode}</span>
+          <span className="capitalize hidden lg:block">{searchMode}</span>
           <IoIosArrowDown
             size={20}
             className={`cursor-pointer duration-400 ${filterOpen ? 'rotate-180' : ''}`}
