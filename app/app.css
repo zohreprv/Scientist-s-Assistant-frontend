@@ -1,15 +1,101 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+@import '@fontsource-variable/geist';
+
+@custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans:
+    'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --primary-color: #f1f1f1;
+  --color-primary: #85827a;
+  --color-blue: #3b82f6;
+  --color-darkgray: #1a1a2e;
 }
 
 html,
 body {
-  @apply bg-white dark:bg-gray-950;
+  scrollbar-gutter: stable;
+
+  /* font-family: 'Poppins', sans-serif; */
+  @apply bg-black dark:bg-gray-950;
 
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
   }
+}
+.options {
+  @apply hover:bg-gray-400 rounded cursor-pointer;
+}
+
+.modal-overlay {
+  position: fixed;
+  background-color: white;
+  color: black;
+  z: 1000;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+  width: 520px;
+}
+.modal-btn {
+  @apply text-sm text-primary cursor-pointer;
+}
+input[type='checkbox'] {
+  @apply sr-only;
+}
+input[type='checkbox'] + label {
+  position: relative;
+  padding-left: 2rem;
+  cursor: pointer;
+}
+input[type='checkbox'] + label::before {
+  content: '';
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  position: absolute;
+  border: 1px solid black;
+  border-radius: 3px;
+  width: 1rem;
+  height: 1rem;
+}
+input[type='checkbox'] + label.sidebar::before {
+  top: 2px;
+  transform: translateY(0);
+  border: 1px solid var(--primary-color);
+}
+input[type='checkbox']:checked + label::before {
+  content: '\2713';
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+  color: white;
+}
+
+.scrollbar-custom {
+  scrollbar-width: thin;
+  scrollbar-color: #888 var(--primary-color);
+}
+.sidefilter-heading {
+  @apply flex items-center gap-2 text-gray-300 uppercase mt-5 mb-3;
+}
+.sidebar-more-btn {
+  @apply px-2 py-1 text-sm text-gray-200 rounded cursor-pointer border border-gray-500 hover:bg-gray-400;
+}
+
+.side {
+  @apply h-full bg-darkgray space-y-2 max-w-1/4 p-5
+     rounded-2xl text-white hidden lg:block z-1000;
 }
