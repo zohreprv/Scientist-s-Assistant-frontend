@@ -21,7 +21,7 @@ const Modal = ({ isModalOpen, setIsModalOpen, children }) => {
   }, [isModalOpen]);
   return (
     <div
-      className={`modal-overlay ${isModalOpen ? '' : 'hidden'} max-w-sm lg:max-w-lg z-12`}
+      className={`modal-overlay ${isModalOpen ? '' : 'hidden'} max-w-2/3 lg:max-w-md z-12`}
       ref={componentRef}
     >
       {children}
