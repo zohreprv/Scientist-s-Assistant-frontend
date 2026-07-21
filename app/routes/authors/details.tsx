@@ -142,12 +142,6 @@ export default function AuthorDetailsPage() {
             />
             <Type urlObj={urlObj} setUrlObj={setUrlObj} setWorks={setWorks} />
           </div>
-          <AuthorsWorks
-            works={works}
-            workData={workData}
-            urlObj={urlObj}
-            handleShowMore={handleShowMore}
-          />
 
           <AuthorsWorks
             works={works}
