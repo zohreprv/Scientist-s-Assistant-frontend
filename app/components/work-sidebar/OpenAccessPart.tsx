@@ -15,6 +15,7 @@ const SideBar = () => {
     queryKey: ['open-access', urlObj],
     queryFn: () => fetchWorks(urlObj),
     retry: 2,
+    placeholderData: (previousData) => previousData,
   });
   const op = ['Open', 'Not Open'];
   const opCount = data?.group_by.map((i) => i.count);

@@ -9,12 +9,16 @@ export const AuthorSideProvider = ({ children }) => {
 
   const [selectedInstitution, setSelectedInstitution] = useState(
     searchParams.get('last_known_institutions.id')
-      ? [searchParams.get('last_known_institutions.id')]
+      ? [...searchParams.get('last_known_institutions.id')?.split('|')]
       : [],
   );
   const [selectedCountry, setSelectedCountry] = useState(
     searchParams.get('last_known_institutions.country_code')
-      ? [searchParams.get('last_known_institutions.country_code')]
+      ? [
+          ...searchParams
+            .get('last_known_institutions.country_code')
+            ?.split('|'),
+        ]
       : [],
   );
   useEffect(() => {

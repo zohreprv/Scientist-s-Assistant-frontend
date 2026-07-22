@@ -1,9 +1,10 @@
 import PaperCard from './PaperCard';
 import Pagination from './Pagination';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchWorks } from '../api/api.js';
 import { PuffLoader } from 'react-spinners';
+import { BarLoader } from 'react-spinners';
 import YearFilter from '~/components/filters/YearFilter';
 import OpenAccessFilter from '~/components/filters/OpenAccess';
 import Filter from '~/components/filters/Filter';
@@ -21,9 +22,10 @@ const Works = () => {
   const { url: urlObj, setUrl: setUrlObj } = useUrl();
   const filterFields = ['cites', 'cited_by', 'related_to'];
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: ['works', urlObj],
     queryFn: () => fetchWorks(urlObj),
+    placeholderData: (previousData) => previousData,
     retry: 2,
   });
   const handlePaperShow = (id) => {
@@ -41,6 +43,13 @@ const Works = () => {
       },
     });
   };
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+
+  useEffect(() => {
+    if (!isLoading) {
+      setHasLoadedOnce(true);
+    }
+  }, [isLoading]);
   return (
     <>
       <div className="flex flex-col gap-5 ">
@@ -114,6 +123,18 @@ const Works = () => {
             color="#36d7b7"
             loading={isLoading}
             size={60}
+            aria-label="Loading Spinner"
+            data-testid="loader"
+          />
+        </div>
+      )}
+      {isFetching && hasLoadedOnce && (
+        <div className="fixed top-0 left-0 right-0 z-50">
+          <BarLoader
+            color="#36d7b7"
+            loading={isFetching}
+            width="100%"
+            height={2}
             aria-label="Loading Spinner"
             data-testid="loader"
           />

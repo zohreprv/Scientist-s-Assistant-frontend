@@ -15,6 +15,7 @@ const YearPart = () => {
     queryKey: ['year_sidebar', urlObj],
     queryFn: () => fetchWorks(urlObj),
     retry: 2,
+    placeholderData: (previousData) => previousData,
   });
   if (!data) return;
 

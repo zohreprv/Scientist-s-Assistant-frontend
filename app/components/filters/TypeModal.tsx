@@ -1,21 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { RxCross2 } from 'react-icons/rx';
 import { useQuery } from '@tanstack/react-query';
 import { fetchWorks } from '../../api/api';
 import { useUrl } from '../../../Context/UrlContext';
 import Modal from '../Modal';
 import { FiSearch } from 'react-icons/fi';
-import { useDebounce } from 'use-debounce';
+import { useWorkSide } from '../../../Context/WorkSideContext';
 const TypeModal = ({ isModalOpen, setIsModalOpen }) => {
   const [search, setSearch] = useState('');
-  const [debouncedSearch] = useDebounce(search, 300);
-
-  const { url, setUrl } = useUrl();
-  const [types, setTypes] = useState([]);
+  const form = useRef(null);
+  const { selectedType, setSelectedType } = useWorkSide();
   const [urlObj, setUrlObj] = useState({
     search: {
       group_by: 'type',
-      q: '',
     },
     filter: {},
   });
@@ -25,31 +22,28 @@ const TypeModal = ({ isModalOpen, setIsModalOpen }) => {
     retry: 2,
     enabled: isModalOpen,
   });
+  const { data: dataOnSearch } = useQuery({
+    queryKey: ['type', search],
+    queryFn: () =>
+      fetchWorks({
+        filter: {},
+        search: { q: search, group_by: 'type' },
+      }),
+    retry: 2,
+    enabled: !!search,
+    placeholderData: (previousData) => previousData,
+  });
 
-  useEffect(() => {
-    setUrlObj({
-      ...urlObj,
-      search: {
-        ...urlObj.search,
-        q: debouncedSearch,
-      },
+  const handleOnSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(form.current);
+    const checkedTypes = formData.getAll('type');
+    setSelectedType(checkedTypes);
+    setIsModalOpen(false);
+    document.querySelectorAll('.scrollbar-custom').forEach((element) => {
+      element.scrollTop = 0;
     });
-  }, [debouncedSearch]);
-
-  const handleOnChange = (e) => {
-    if (e.target.checked) {
-      setTypes((prev) => [...prev, e.target.value]);
-    } else {
-      setTypes((prev) => prev.filter((t) => t !== e.target.value));
-    }
   };
-
-  useEffect(() => {
-    setUrl({
-      search: { ...url.search, page: 1 },
-      filter: { ...url.filter, type: types.join('|') },
-    });
-  }, [types]);
 
   return (
     <div>
@@ -72,6 +66,12 @@ const TypeModal = ({ isModalOpen, setIsModalOpen }) => {
             onClick={() => {
               setIsModalOpen(false);
               setSearch('');
+              form.current.reset();
+              document
+                .querySelectorAll('.scrollbar-custom')
+                .forEach((element) => {
+                  element.scrollTop = 0;
+                });
             }}
             role="button"
             aria-label="close type modal"
@@ -80,36 +80,127 @@ const TypeModal = ({ isModalOpen, setIsModalOpen }) => {
           </div>
         </div>
         <div className="border-b border-gray-300 m-2 -mx-2"></div>
-
-        <div className="h-115 overflow-y-scroll scrollbar-custom p-1 my-3">
-          {data?.group_by.map((type, index) => (
-            <div
-              className="flex justify-between items-center p-1 px-2 text-sm rounded hover:bg-gray-200"
-              key={type.key_display_name}
-            >
-              <div className="flex items-center w-full">
-                <input
-                  type="checkbox"
-                  name="type"
-                  id={type.key_display_name}
-                  value={type.key_display_name}
-                  checked={types.includes(type.key_display_name)}
-                  onChange={handleOnChange}
-                  aria-describedby={index}
-                />
-                <label
-                  htmlFor={type.key_display_name}
-                  className="flex-1"
-                  id={index}
-                  aria-hidden={true}
+        <form ref={form}>
+          <div className="h-115 overflow-y-scroll scrollbar-custom p-1 my-3">
+            {search === '' &&
+              selectedType?.map((type, index) => (
+                <div
+                  className="flex justify-between items-center p-1 px-2 text-sm rounded hover:bg-gray-200"
+                  key={type}
                 >
-                  {type.key_display_name}
-                </label>
-              </div>
-              <span>{type.count.toLocaleString()}</span>
-            </div>
-          ))}
-        </div>
+                  <div className="flex items-center w-full">
+                    <input
+                      type="checkbox"
+                      name="type"
+                      id={type}
+                      value={type}
+                      defaultChecked={selectedType.includes(type)}
+                      aria-describedby={index}
+                    />
+                    <label
+                      htmlFor={type}
+                      className="flex-1"
+                      id={index}
+                      aria-hidden={true}
+                    >
+                      {type}
+                    </label>
+                  </div>
+                </div>
+              ))}
+            {search === ''
+              ? data?.group_by
+                  .filter((t) =>
+                    selectedType.length > 0
+                      ? !selectedType.some((st) => st === t.key_display_name)
+                      : true,
+                  )
+                  .map((type, index) => (
+                    <div
+                      className="flex justify-between items-center p-1 px-2 text-sm rounded hover:bg-gray-200"
+                      key={type.key_display_name}
+                    >
+                      <div className="flex items-center w-full">
+                        <input
+                          type="checkbox"
+                          name="type"
+                          id={type.key_display_name}
+                          value={type.key_display_name}
+                          defaultChecked={selectedType.includes(
+                            type.key_display_name,
+                          )}
+                          aria-describedby={index}
+                        />
+                        <label
+                          htmlFor={type.key_display_name}
+                          className="flex-1"
+                          id={index}
+                          aria-hidden={true}
+                        >
+                          {type.key_display_name}
+                        </label>
+                      </div>
+                    </div>
+                  ))
+              : dataOnSearch?.group_by
+                  .filter((t) =>
+                    selectedType.length > 0
+                      ? !selectedType.some((st) => st === t.key_display_name)
+                      : true,
+                  )
+                  .map((type, index) => (
+                    <div
+                      className="flex justify-between items-center p-1 px-2 text-sm rounded hover:bg-gray-200"
+                      key={type.key_display_name}
+                    >
+                      <div className="flex items-center w-full">
+                        <input
+                          type="checkbox"
+                          name="type"
+                          id={type.key_display_name}
+                          value={type.key_display_name}
+                          defaultChecked={selectedType.includes(
+                            type.key_display_name,
+                          )}
+                          aria-describedby={index}
+                        />
+                        <label
+                          htmlFor={type.key_display_name}
+                          className="flex-1"
+                          id={index}
+                          aria-hidden={true}
+                        >
+                          {type.key_display_name}
+                        </label>
+                      </div>
+                    </div>
+                  ))}
+          </div>
+          <div className="flex gap-2 justify-end mt-4">
+            <button
+              className=" px-2 py-1 text-sm text-gray-800 rounded cursor-pointer hover:bg-gray-400"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsModalOpen(false);
+                setSearch('');
+                form.current.reset();
+                document
+                  .querySelectorAll('.scrollbar-custom')
+                  .forEach((element) => {
+                    element.scrollTop = 0;
+                  });
+              }}
+            >
+              Back
+            </button>
+            <button
+              className=" px-2 py-1 text-sm text-gray-800 rounded cursor-pointer border border-gray-500 hover:bg-gray-400"
+              onClick={handleOnSubmit}
+            >
+              Apply
+            </button>
+          </div>
+        </form>
       </Modal>
     </div>
   );

@@ -1,40 +1,44 @@
 import Modal from '../Modal';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
-import { fetchAuthors, fetchInstitutions } from '../../api/api';
+import { useState, useRef } from 'react';
+import { fetchAuthors } from '../../api/api';
 import { RxCross2 } from 'react-icons/rx';
 import { useAuthorSide } from '../../../Context/AuthorSideContext';
 import { FiSearch } from 'react-icons/fi';
-import { useAuthorUrl } from '../../../Context/AuthorUrlContext';
-const InstitutionModal = ({ isModalOpen, setIsModalOpen }) => {
+const InstitutionModal = ({
+  data,
+  selectedData,
+  isModalOpen,
+  setIsModalOpen,
+}) => {
   const { selectedInstitution, setSelectedInstitution } = useAuthorSide();
-  const [urlObj] = useState({
-    filter: {},
-    search: { group_by: 'last_known_institutions.id' },
-  });
+
   const [search, setSearch] = useState('');
-  const { data } = useQuery({
+  const form = useRef(null);
+
+  const { data: dataOnSearch } = useQuery({
     queryKey: ['institution', search],
-    queryFn: () => {
-      if (search === '') {
-        return fetchAuthors('', urlObj);
-      } else {
-        return fetchInstitutions(search);
-      }
-    },
+    queryFn: () =>
+      fetchAuthors('', {
+        filter: {},
+        search: { q: search, group_by: 'last_known_institutions.id' },
+      }),
     retry: 2,
-    enabled: isModalOpen,
+    enabled: !!search,
+    placeholderData: (previousData) => previousData,
   });
 
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked) {
-      setSelectedInstitution((prev) => [...prev, e.target.name]);
-    } else {
-      setSelectedInstitution(
-        selectedInstitution.filter((i) => i !== e.target.name),
-      );
-    }
+  const handleOnSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(form.current);
+    const checkedInstitutions = formData.getAll('institution');
+    setSelectedInstitution(checkedInstitutions);
+    setIsModalOpen(false);
+    document.querySelectorAll('.scrollbar-custom').forEach((element) => {
+      element.scrollTop = 0;
+    });
   };
+
   return (
     <Modal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
       <div className="flex justify-between items-center px-2">
@@ -55,6 +59,12 @@ const InstitutionModal = ({ isModalOpen, setIsModalOpen }) => {
           onClick={() => {
             setIsModalOpen(false);
             setSearch('');
+            form.current.reset();
+            document
+              .querySelectorAll('.scrollbar-custom')
+              .forEach((element) => {
+                element.scrollTop = 0;
+              });
           }}
           role="button"
           aria-label="close topic modal"
@@ -63,69 +73,97 @@ const InstitutionModal = ({ isModalOpen, setIsModalOpen }) => {
         </div>
       </div>
       <div className="border-b border-gray-300 m-2 -mx-2"></div>
-      <form>
+      <form ref={form}>
         <div className="overflow-y-scroll h-100 scrollbar-custom">
+          {search === '' &&
+            selectedInstitution.length > 0 &&
+            selectedData?.results.map((item) => (
+              <div
+                className="flex justify-between items-center p-1 px-2 text-sm rounded hover:bg-gray-200"
+                key={item.id}
+              >
+                <input
+                  type="checkbox"
+                  value={item.id.replace('https://openalex.org/', '')}
+                  name="institution"
+                  className="mr-1"
+                  id={item.id}
+                  defaultChecked={selectedInstitution.includes(
+                    item.id.replace('https://openalex.org/', ''),
+                  )}
+                />
+                <label
+                  className="block w-full"
+                  htmlFor={item.id}
+                  aria-hidden={true}
+                >
+                  {item.display_name}
+                </label>
+              </div>
+            ))}
           {search === ''
-            ? data?.group_by.map((item, index) => (
-                <div
-                  className="flex justify-between items-center p-1 px-2 text-sm rounded hover:bg-gray-200"
-                  key={item.key}
-                >
-                  <input
-                    type="checkbox"
-                    name={item.key.replace('https://openalex.org/', '')}
-                    className="mr-1"
-                    id={item.key}
-                    checked={selectedInstitution.includes(
-                      item.key.replace('https://openalex.org/', ''),
-                    )}
-                    onChange={handleOnChange}
-                    aria-describedby={index}
-                  />
-                  <label
-                    className="block w-full"
-                    htmlFor={item.key}
-                    id={index}
-                    aria-hidden={true}
+            ? data?.group_by
+                ?.filter((item) =>
+                  selectedInstitution.length > 0
+                    ? !selectedData?.results.some((s) => s.id === item.key)
+                    : true,
+                )
+                .map((item, index) => (
+                  <div
+                    className="flex justify-between items-center p-1 px-2 text-sm rounded hover:bg-gray-200"
+                    key={item.key}
                   >
-                    {item.key_display_name}
-                  </label>
-                </div>
-              ))
-            : data?.results.map((item) => (
-                <div
-                  className="flex justify-between items-center p-1 px-2 text-sm rounded hover:bg-gray-200"
-                  key={item.id}
-                >
-                  <input
-                    type="checkbox"
-                    name={item.id.replace('https://openalex.org/', '')}
-                    className="mr-1"
-                    id={item.id}
-                    checked={selectedInstitution.includes(
-                      item.id.replace('https://openalex.org/', ''),
-                    )}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedInstitution((prev) => [
-                          ...prev,
-                          e.target.name,
-                        ]);
-                      } else {
-                        setSelectedInstitution(
-                          selectedInstitution.filter(
-                            (i) => i !== e.target.name,
-                          ),
-                        );
-                      }
-                    }}
-                  />
+                    <input
+                      type="checkbox"
+                      value={item.key.replace('https://openalex.org/', '')}
+                      name="institution"
+                      className="mr-1"
+                      id={item.key}
+                      defaultChecked={selectedInstitution.includes(
+                        item.key.replace('https://openalex.org/', ''),
+                      )}
+                      aria-describedby={index}
+                    />
+                    <label
+                      className="block w-full"
+                      htmlFor={item.key}
+                      aria-hidden={true}
+                    >
+                      {item.key_display_name}
+                    </label>
+                  </div>
+                ))
+            : dataOnSearch?.group_by
+                ?.filter((item) =>
+                  selectedInstitution.length > 0
+                    ? !selectedData?.results.some((s) => s.key === item.key)
+                    : true,
+                )
+                .map((item) => (
+                  <div
+                    className="flex justify-between items-center p-1 px-2 text-sm rounded hover:bg-gray-200"
+                    key={item.key}
+                  >
+                    <input
+                      type="checkbox"
+                      value={item.key.replace('https://openalex.org/', '')}
+                      name="institution"
+                      className="mr-1"
+                      id={item.key}
+                      defaultChecked={selectedInstitution.includes(
+                        item.key.replace('https://openalex.org/', ''),
+                      )}
+                    />
 
-                  <label key={item.id} className="block" htmlFor={item.id}>
-                    {item.display_name}
-                  </label>
-                </div>
-              ))}
+                    <label
+                      key={item.key}
+                      className="block w-full"
+                      htmlFor={item.key}
+                    >
+                      {item.key_display_name}
+                    </label>
+                  </div>
+                ))}
         </div>
         <div className="flex gap-2 justify-end mt-4">
           <button
@@ -134,18 +172,22 @@ const InstitutionModal = ({ isModalOpen, setIsModalOpen }) => {
               e.preventDefault();
               setIsModalOpen(false);
               setSearch('');
+              form.current.reset();
+              document
+                .querySelectorAll('.scrollbar-custom')
+                .forEach((element) => {
+                  element.scrollTop = 0;
+                });
             }}
           >
             Back
           </button>
-          {/* <button
+          <button
             className=" px-2 py-1 text-sm text-gray-800 rounded cursor-pointer border border-gray-500 hover:bg-gray-400"
-            onClick={(e) => {
-              e.preventDefault();
-            }}
+            onClick={handleOnSubmit}
           >
             Apply
-          </button> */}
+          </button>
         </div>
       </form>
     </Modal>

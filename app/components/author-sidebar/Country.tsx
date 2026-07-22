@@ -1,35 +1,37 @@
 import { useQuery } from '@tanstack/react-query';
-import { useUrl } from '../../../Context/UrlContext';
-import { fetchWorks, fetchTopics } from '../../api/api';
-import { FiTag } from 'react-icons/fi';
-import { useEffect, useState } from 'react';
-import TopicModal from '../filters/TopicModal';
-import { useWorkSide } from '../../../Context/WorkSideContext';
-const Topic = () => {
+import { fetchAuthors, fetchCountries } from '../../api/api';
+import { IoGlobeOutline } from 'react-icons/io5';
+import { useState, useEffect } from 'react';
+import { useAuthorSide } from '../../../Context/AuthorSideContext';
+import { useAuthorUrl } from '../../../Context/AuthorUrlContext';
+import CountryModal from '../filters/CountryModal';
+const Country = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { selectedTopic, setSelectedTopic } = useWorkSide();
-  const { url, setUrl } = useUrl();
+  const { url, setUrl } = useAuthorUrl();
+  const { selectedCountry, setSelectedCountry } = useAuthorSide();
   const [urlObj, setUrlObj] = useState({
-    filter: { ...url.filter },
-    search: { group_by: 'primary_topic.id' },
+    filter: {},
+    search: { group_by: 'last_known_institutions.country_code' },
   });
   const { data } = useQuery({
-    queryKey: ['topic', urlObj],
-    queryFn: () => fetchWorks(urlObj),
+    queryKey: ['country', urlObj],
+    queryFn: () => fetchAuthors('', urlObj),
   });
   const [urlselected, setUrlSelected] = useState({});
   useEffect(() => {
     setUrlSelected((prev) => ({
       search: {},
       filter: {
-        id: selectedTopic.join('|') || '',
+        id:
+          selectedCountry.map((i) => i.replace('/countries', '')).join('|') ||
+          '',
       },
     }));
-  }, [selectedTopic]);
+  }, [selectedCountry]);
   const { data: selectedData } = useQuery({
     queryKey: ['selected-countries', urlselected],
-    queryFn: () => fetchTopics(urlselected),
-    enabled: selectedTopic.length > 0,
+    queryFn: () => fetchCountries(urlselected),
+    enabled: selectedCountry.length > 0,
     placeholderData: (previousData) => {
       if (previousData?.results?.length < 5) {
         return previousData;
@@ -40,9 +42,9 @@ const Topic = () => {
   });
   const handleOnChange = (e) => {
     if (e.target.checked) {
-      setSelectedTopic((prev) => [...prev, e.target.name]);
+      setSelectedCountry((prev) => [...prev, e.target.name]);
     } else {
-      setSelectedTopic(selectedTopic.filter((i) => i !== e.target.name));
+      setSelectedCountry(selectedCountry.filter((i) => i !== e.target.name));
     }
     setUrl({
       ...url,
@@ -52,14 +54,15 @@ const Topic = () => {
       },
     });
   };
+
   return (
     <>
       <h2 className="sidefilter-heading">
-        <FiTag size={20} />
-        Topic
+        <IoGlobeOutline size={20} />
+        <span>Country</span>
       </h2>
       <div>
-        {selectedTopic.length > 0 &&
+        {selectedCountry.length > 0 &&
           selectedData?.results.map((item) => (
             <div key={item.id} className="flex justify-between ">
               <div>
@@ -68,7 +71,7 @@ const Topic = () => {
                   name={item.id.replace('https://openalex.org/', '')}
                   id={item.id.replace('https://openalex.org/', '')}
                   className="mr-1"
-                  checked={selectedTopic.includes(
+                  checked={selectedCountry.includes(
                     item.id.replace('https://openalex.org/', ''),
                   )}
                   onChange={handleOnChange}
@@ -83,7 +86,7 @@ const Topic = () => {
               <p>{item.works_count.toLocaleString()}</p>
             </div>
           ))}
-        {selectedTopic.length === 0 &&
+        {selectedCountry.length === 0 &&
           data?.group_by.slice(0, 5).map((item) => (
             <div key={item.key} className="flex justify-between ">
               <div>
@@ -92,7 +95,7 @@ const Topic = () => {
                   name={item.key.replace('https://openalex.org/', '')}
                   id={item.key.replace('https://openalex.org/', '')}
                   className="mr-1"
-                  checked={selectedTopic.includes(
+                  checked={selectedCountry.includes(
                     item.key.replace('https://openalex.org/', ''),
                   )}
                   onChange={handleOnChange}
@@ -121,7 +124,7 @@ const Topic = () => {
           More...
         </button>
       </div>
-      <TopicModal
+      <CountryModal
         data={data}
         selectedData={selectedData}
         isModalOpen={isModalOpen}
@@ -131,4 +134,4 @@ const Topic = () => {
   );
 };
 
-export default Topic;
+export default Country;

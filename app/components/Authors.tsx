@@ -1,7 +1,7 @@
 import { fetchAuthors } from '../api/api.js';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
-import { PuffLoader } from 'react-spinners';
+import { useState, useEffect } from 'react';
+import { BarLoader, PuffLoader } from 'react-spinners';
 import AuthorCard from './AuthorCard';
 import Pagination from './Pagination';
 import Filter from './filters/Filter';
@@ -13,12 +13,20 @@ const Authors = () => {
   const [isInsModalOpen, setIsInsModalOpen] = useState(false);
   const [isCountryModalOpen, setIsCountryModalOpen] = useState(false);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: ['authors', urlObj],
     queryFn: () => fetchAuthors('', urlObj),
     // enabled: debouncedAuthorSearch?.length > 3,
     retry: (failureCount) => failureCount < 2,
+    placeholderData: (previousData) => previousData,
   });
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+
+  useEffect(() => {
+    if (!isLoading) {
+      setHasLoadedOnce(true);
+    }
+  }, [isLoading]);
   return (
     <>
       <div>
@@ -74,7 +82,19 @@ const Authors = () => {
           />
         </div>
       )}
-      {data?.results.map((author) => (
+      {isFetching && hasLoadedOnce && (
+        <div className="fixed top-0 left-0 right-0 z-50">
+          <BarLoader
+            color="#36d7b7"
+            loading={isFetching}
+            width="100%"
+            height={2}
+            aria-label="Loading Spinner"
+            data-testid="loader"
+          />
+        </div>
+      )}
+      {data?.results?.map((author) => (
         <AuthorCard author={author} key={author.id} />
       ))}
       <Pagination data={data} urlObj={urlObj} setUrlObj={setUrlObj} />

@@ -1,39 +1,36 @@
 import Modal from '../Modal';
 import { useQuery } from '@tanstack/react-query';
-import { useState, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { fetchAuthors } from '../../api/api';
 import { RxCross2 } from 'react-icons/rx';
 import { useAuthorSide } from '../../../Context/AuthorSideContext';
 import { FiSearch } from 'react-icons/fi';
-const CountryModal = ({ isModalOpen, setIsModalOpen }) => {
+const CountryModal = ({ data, selectedData, isModalOpen, setIsModalOpen }) => {
   const { selectedCountry, setSelectedCountry } = useAuthorSide();
   const [search, setSearch] = useState('');
-  const [urlObj, setUrlObj] = useState({
-    filter: {},
-    search: { group_by: 'last_known_institutions.country_code' },
-  });
-  useEffect(() => {
-    setUrlObj({
-      ...urlObj,
-      search: {
-        ...urlObj.search,
-        q: search,
-      },
-    });
-  }, [search]);
-  const { data } = useQuery({
+  const form = useRef(null);
+
+  const { data: dataOnSearch } = useQuery({
     queryKey: ['country', search],
-    queryFn: () => fetchAuthors('', urlObj),
+    queryFn: () =>
+      fetchAuthors('', {
+        filter: {},
+        search: { q: search, group_by: 'last_known_institutions.country_code' },
+      }),
     retry: 2,
-    enabled: isModalOpen,
+    enabled: !!search,
+    placeholderData: (previousData) => previousData,
   });
 
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked) {
-      setSelectedCountry((prev) => [...prev, e.target.name]);
-    } else {
-      setSelectedCountry(selectedCountry.filter((i) => i !== e.target.name));
-    }
+  const handleOnSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(form.current);
+    const checkedCountries = formData.getAll('country');
+    setSelectedCountry(checkedCountries);
+    setIsModalOpen(false);
+    document.querySelectorAll('.scrollbar-custom').forEach((element) => {
+      element.scrollTop = 0;
+    });
   };
   return (
     <Modal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
@@ -55,6 +52,12 @@ const CountryModal = ({ isModalOpen, setIsModalOpen }) => {
           onClick={() => {
             setIsModalOpen(false);
             setSearch('');
+            form.current.reset();
+            document
+              .querySelectorAll('.scrollbar-custom')
+              .forEach((element) => {
+                element.scrollTop = 0;
+              });
           }}
           role="button"
           aria-label="close topic modal"
@@ -63,34 +66,96 @@ const CountryModal = ({ isModalOpen, setIsModalOpen }) => {
         </div>
       </div>
       <div className="border-b border-gray-300 m-2 -mx-2"></div>
-      <form>
+      <form ref={form}>
         <div className="overflow-y-scroll h-100 scrollbar-custom">
-          {data?.group_by.map((item, index) => (
-            <div
-              className="flex justify-between items-center p-1 px-2 text-sm rounded hover:bg-gray-200"
-              key={item.key}
-            >
-              <input
-                type="checkbox"
-                name={item.key.replace('https://openalex.org/', '')}
-                className="mr-1"
-                id={item.key}
-                checked={selectedCountry.includes(
-                  item.key.replace('https://openalex.org/', ''),
-                )}
-                onChange={handleOnChange}
-                aria-describedby={index}
-              />
-              <label
-                className="block w-full"
-                htmlFor={item.key}
-                id={index}
-                aria-hidden={true}
+          {search === '' &&
+            selectedData?.results.map((item) => (
+              <div
+                key={item.id}
+                className="flex justify-between items-center p-1 px-2 text-sm rounded hover:bg-gray-200"
               >
-                {item.key_display_name}
-              </label>
-            </div>
-          ))}
+                <div>
+                  <input
+                    type="checkbox"
+                    name="country"
+                    id={item.id}
+                    value={item.id.replace('https://openalex.org/', '')}
+                    className="mr-1"
+                    defaultChecked={selectedCountry.includes(
+                      item.id.replace('https://openalex.org/', ''),
+                    )}
+                  />
+                  <label className="block w-full" htmlFor={item.id}>
+                    {item.display_name}
+                  </label>
+                </div>
+              </div>
+            ))}
+          {search === ''
+            ? data?.group_by
+                ?.filter((item) =>
+                  selectedCountry.length > 0
+                    ? !selectedData?.results.some((s) => s.id === item.key)
+                    : true,
+                )
+                .map((item, index) => (
+                  <div
+                    className="flex justify-between items-center p-1 px-2 text-sm rounded hover:bg-gray-200"
+                    key={item.key}
+                  >
+                    <input
+                      type="checkbox"
+                      name="country"
+                      value={item.key.replace('https://openalex.org/', '')}
+                      className="mr-1"
+                      id={item.key}
+                      defaultChecked={selectedCountry.includes(
+                        item.key.replace('https://openalex.org/', ''),
+                      )}
+                      aria-describedby={index}
+                    />
+                    <label
+                      className="block w-full"
+                      htmlFor={item.key}
+                      id={index}
+                      aria-hidden={true}
+                    >
+                      {item.key_display_name}
+                    </label>
+                  </div>
+                ))
+            : dataOnSearch?.group_by
+                ?.filter((item) =>
+                  selectedCountry.length > 0
+                    ? !selectedData?.results.some((s) => s.id === item.key)
+                    : true,
+                )
+                .map((item, index) => (
+                  <div
+                    className="flex justify-between items-center p-1 px-2 text-sm rounded hover:bg-gray-200"
+                    key={item.key}
+                  >
+                    <input
+                      type="checkbox"
+                      name="country"
+                      value={item.key.replace('https://openalex.org/', '')}
+                      className="mr-1"
+                      id={item.key}
+                      defaultChecked={selectedCountry.includes(
+                        item.key.replace('https://openalex.org/', ''),
+                      )}
+                      aria-describedby={index}
+                    />
+                    <label
+                      className="block w-full"
+                      htmlFor={item.key}
+                      id={index}
+                      aria-hidden={true}
+                    >
+                      {item.key_display_name}
+                    </label>
+                  </div>
+                ))}
         </div>
         <div className="flex gap-2 justify-end mt-4">
           <button
@@ -99,9 +164,21 @@ const CountryModal = ({ isModalOpen, setIsModalOpen }) => {
               e.preventDefault();
               setIsModalOpen(false);
               setSearch('');
+              form.current.reset();
+              document
+                .querySelectorAll('.scrollbar-custom')
+                .forEach((element) => {
+                  element.scrollTop = 0;
+                });
             }}
           >
             Back
+          </button>
+          <button
+            className=" px-2 py-1 text-sm text-gray-800 rounded cursor-pointer border border-gray-500 hover:bg-gray-400"
+            onClick={handleOnSubmit}
+          >
+            Apply
           </button>
         </div>
       </form>

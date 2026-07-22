@@ -8,6 +8,10 @@ const Modal = ({ isModalOpen, setIsModalOpen, children }) => {
         !componentRef.current.contains(e.target as Node)
       ) {
         setIsModalOpen(false);
+        document.querySelectorAll('form').forEach((form) => form.reset());
+        document.querySelectorAll('.scrollbar-custom').forEach((element) => {
+          element.scrollTop = 0;
+        });
       }
     };
 

@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router';
-import SideBar from '~/components/author-sidebar.tsx/Sidebar';
+import SideBar from '~/components/author-sidebar/Sidebar';
 import { AuthorUrlProvider } from '../../../Context/AuthorUrlContext';
 import { AuthorSideProvider } from '../../../Context/AuthorSideContext';
 const AuthorsLayout = () => {

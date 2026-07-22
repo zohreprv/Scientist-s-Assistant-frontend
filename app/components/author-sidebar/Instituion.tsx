@@ -1,48 +1,58 @@
 import { useQuery } from '@tanstack/react-query';
-import { useUrl } from '../../../Context/UrlContext';
-import { fetchWorks, fetchTopics } from '../../api/api';
-import { FiTag } from 'react-icons/fi';
+import { fetchAuthors, fetchInstitutions } from '../../api/api';
+import { BiSolidInstitution } from 'react-icons/bi';
 import { useEffect, useState } from 'react';
-import TopicModal from '../filters/TopicModal';
-import { useWorkSide } from '../../../Context/WorkSideContext';
-const Topic = () => {
+import { useAuthorSide } from '../../../Context/AuthorSideContext';
+import { useAuthorUrl } from '../../../Context/AuthorUrlContext';
+import InstitutionModal from '../filters/InstitutionModal';
+
+const Institution = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { selectedTopic, setSelectedTopic } = useWorkSide();
-  const { url, setUrl } = useUrl();
+  const { url, setUrl } = useAuthorUrl();
+  const { selectedInstitution, setSelectedInstitution } = useAuthorSide();
   const [urlObj, setUrlObj] = useState({
-    filter: { ...url.filter },
-    search: { group_by: 'primary_topic.id' },
+    filter: {},
+    search: { group_by: 'last_known_institutions.id' },
   });
   const { data } = useQuery({
-    queryKey: ['topic', urlObj],
-    queryFn: () => fetchWorks(urlObj),
+    queryKey: ['institution', urlObj],
+    queryFn: () => fetchAuthors('', urlObj),
   });
   const [urlselected, setUrlSelected] = useState({});
   useEffect(() => {
     setUrlSelected((prev) => ({
       search: {},
-      filter: {
-        id: selectedTopic.join('|') || '',
-      },
+      filter: { id: selectedInstitution.join('|') || '' },
     }));
-  }, [selectedTopic]);
+  }, [selectedInstitution]);
   const { data: selectedData } = useQuery({
-    queryKey: ['selected-countries', urlselected],
-    queryFn: () => fetchTopics(urlselected),
-    enabled: selectedTopic.length > 0,
+    queryKey: ['selected-institution', urlselected],
+    queryFn: () => fetchInstitutions(urlselected),
+    enabled: selectedInstitution.length > 0,
     placeholderData: (previousData) => {
-      if (previousData?.results?.length < 5) {
+      if (previousData?.results.length < 5) {
         return previousData;
       } else {
         return null;
       }
     },
   });
+  useEffect(() => {
+    setUrlObj((prev) => ({
+      ...prev,
+      filter: {
+        'last_known_institutions.country_code':
+          url.filter['last_known_institutions.country_code'],
+      },
+    }));
+  }, [url]);
   const handleOnChange = (e) => {
     if (e.target.checked) {
-      setSelectedTopic((prev) => [...prev, e.target.name]);
+      setSelectedInstitution((prev) => [...prev, e.target.name]);
     } else {
-      setSelectedTopic(selectedTopic.filter((i) => i !== e.target.name));
+      setSelectedInstitution(
+        selectedInstitution.filter((i) => i !== e.target.name),
+      );
     }
     setUrl({
       ...url,
@@ -55,11 +65,11 @@ const Topic = () => {
   return (
     <>
       <h2 className="sidefilter-heading">
-        <FiTag size={20} />
-        Topic
+        <BiSolidInstitution size={20} />
+        <span>Institution</span>
       </h2>
       <div>
-        {selectedTopic.length > 0 &&
+        {selectedInstitution.length > 0 &&
           selectedData?.results.map((item) => (
             <div key={item.id} className="flex justify-between ">
               <div>
@@ -68,7 +78,7 @@ const Topic = () => {
                   name={item.id.replace('https://openalex.org/', '')}
                   id={item.id.replace('https://openalex.org/', '')}
                   className="mr-1"
-                  checked={selectedTopic.includes(
+                  checked={selectedInstitution.includes(
                     item.id.replace('https://openalex.org/', ''),
                   )}
                   onChange={handleOnChange}
@@ -83,7 +93,7 @@ const Topic = () => {
               <p>{item.works_count.toLocaleString()}</p>
             </div>
           ))}
-        {selectedTopic.length === 0 &&
+        {selectedInstitution.length === 0 &&
           data?.group_by.slice(0, 5).map((item) => (
             <div key={item.key} className="flex justify-between ">
               <div>
@@ -92,7 +102,7 @@ const Topic = () => {
                   name={item.key.replace('https://openalex.org/', '')}
                   id={item.key.replace('https://openalex.org/', '')}
                   className="mr-1"
-                  checked={selectedTopic.includes(
+                  checked={selectedInstitution.includes(
                     item.key.replace('https://openalex.org/', ''),
                   )}
                   onChange={handleOnChange}
@@ -121,7 +131,7 @@ const Topic = () => {
           More...
         </button>
       </div>
-      <TopicModal
+      <InstitutionModal
         data={data}
         selectedData={selectedData}
         isModalOpen={isModalOpen}
@@ -131,4 +141,4 @@ const Topic = () => {
   );
 };
 
-export default Topic;
+export default Institution;
