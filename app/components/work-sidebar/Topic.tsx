@@ -53,12 +53,12 @@ const Topic = () => {
     });
   };
   return (
-    <>
+    <div>
       <h2 className="sidefilter-heading">
         <FiTag size={20} />
         Topic
       </h2>
-      <div>
+      <div className="h-[30vh]">
         {selectedTopic.length > 0 &&
           selectedData?.results.map((item) => (
             <div key={item.id} className="flex justify-between ">
@@ -108,7 +108,7 @@ const Topic = () => {
             </div>
           ))}
       </div>
-      <div className="flex flex-row-reverse">
+      <div className="flex flex-row-reverse mt-5">
         <button
           className="sidebar-more-btn"
           onClick={(e) => {
@@ -127,7 +127,7 @@ const Topic = () => {
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
       />
-    </>
+    </div>
   );
 };
 

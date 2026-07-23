@@ -56,12 +56,12 @@ const Country = () => {
   };
 
   return (
-    <>
+    <div>
       <h2 className="sidefilter-heading">
         <IoGlobeOutline size={20} />
         <span>Country</span>
       </h2>
-      <div>
+      <div className="h-[20vh]">
         {selectedCountry.length > 0 &&
           selectedData?.results.map((item) => (
             <div key={item.id} className="flex justify-between ">
@@ -111,7 +111,7 @@ const Country = () => {
             </div>
           ))}
       </div>
-      <div className="flex flex-row-reverse">
+      <div className="flex flex-row-reverse mt-5">
         <button
           className="sidebar-more-btn"
           onClick={(e) => {
@@ -130,7 +130,7 @@ const Country = () => {
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
       />
-    </>
+    </div>
   );
 };
 

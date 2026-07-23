@@ -63,12 +63,12 @@ const Institution = () => {
     });
   };
   return (
-    <>
+    <div>
       <h2 className="sidefilter-heading">
         <BiSolidInstitution size={20} />
         <span>Institution</span>
       </h2>
-      <div>
+      <div className="h-[20vh]">
         {selectedInstitution.length > 0 &&
           selectedData?.results.map((item) => (
             <div key={item.id} className="flex justify-between ">
@@ -118,7 +118,7 @@ const Institution = () => {
             </div>
           ))}
       </div>
-      <div className="flex flex-row-reverse">
+      <div className="flex flex-row-reverse mt-5">
         <button
           className="sidebar-more-btn"
           onClick={(e) => {
@@ -137,7 +137,7 @@ const Institution = () => {
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
       />
-    </>
+    </div>
   );
 };
 
